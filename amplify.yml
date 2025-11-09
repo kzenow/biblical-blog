@@ -1,4 +1,6 @@
 version: 1
+framework:
+  name: next
 frontend:
   phases:
     preBuild:
@@ -6,6 +8,7 @@ frontend:
         - npm ci
     build:
       commands:
+        - env
         - npm run build
   artifacts:
     baseDirectory: .next
