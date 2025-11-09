@@ -8,7 +8,8 @@ frontend:
         - npm ci
     build:
       commands:
-        - env
+        - echo "Environment variables:"
+        - env | grep NEXT_PUBLIC
         - npm run build
   artifacts:
     baseDirectory: .next
