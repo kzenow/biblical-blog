@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-biblical-parchment text-biblical-deepBrown;
+  }
+}
+
+@layer components {
+  .biblical-heading {
+    @apply font-biblical text-biblical-burgundy;
+  }
+
+  .biblical-card {
+    @apply bg-white border-2 border-biblical-sand rounded-lg shadow-lg p-6;
+  }
+
+  .biblical-button {
+    @apply bg-biblical-burgundy text-biblical-parchment px-6 py-3 rounded-md hover:bg-opacity-90 transition-all font-semibold;
+  }
+
+  .biblical-input {
+    @apply border-2 border-biblical-olive rounded-md px-4 py-2 focus:outline-none focus:border-biblical-burgundy;
+  }
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply min-h-[300px] p-4 focus:outline-none;
+}
+
+.ProseMirror > * + * {
+  margin-top: 0.75em;
+}
+
+.ProseMirror h1 {
+  @apply text-3xl font-bold biblical-heading;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-bold biblical-heading;
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-bold biblical-heading;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding: 0 1rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-biblical-olive pl-4 italic my-4;
+}
+
+.ProseMirror code {
+  @apply bg-biblical-sand px-2 py-1 rounded text-sm;
+}
+
+.ProseMirror img {
+  @apply max-w-full h-auto rounded-lg my-4;
+}
