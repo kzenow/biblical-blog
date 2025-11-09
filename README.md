@@ -2,6 +2,8 @@
 
 A full-featured blog website built with Next.js 14 (App Router), Supabase, and Tailwind CSS. This blog platform is designed for biblical and spiritual content with scheduled post management, rich text editing, and authentication.
 
+**🌐 Live Demo**: [https://biblical-blog.vercel.app](https://biblical-blog.vercel.app)
+
 ## Features
 
 - **Authentication**: Secure user authentication with Supabase Auth
@@ -144,16 +146,22 @@ Access the admin dashboard at `/admin` (requires authentication).
 
 ## Deployment
 
-### Deploy to Vercel
+### Deploy to Vercel (Recommended)
 
-1. Push your code to GitHub
-2. Import your repository in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+**Vercel is the recommended platform** for this Next.js 14 App Router project.
 
-### Set up Cron Job
+1. **Sign up** at [vercel.com](https://vercel.com) with GitHub
+2. **Import repository**: Click "New Project" → Select `biblical-blog` repo
+3. **Add environment variables**:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   ```
+4. **Deploy** - Automatic!
 
-In `vercel.json`:
+### Automatic Cron Job
+
+The project includes `vercel.json` with cron configuration:
 ```json
 {
   "crons": [{
@@ -162,6 +170,10 @@ In `vercel.json`:
   }]
 }
 ```
+
+This automatically runs every 5 minutes on Vercel to update post statuses.
+
+**Note**: AWS Amplify has compatibility issues with Next.js 14 App Router. See `PROJECT_SUMMARY.md` for details.
 
 ## Customization
 

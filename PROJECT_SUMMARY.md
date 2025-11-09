@@ -4,7 +4,7 @@
 
 A full-featured WordPress-style blog platform built with Next.js 14 and Supabase, specifically designed for hosting biblical and spiritual content. The site includes scheduled post publishing, authentication, rich text editing, and file uploads.
 
-**Live Site**: Deployed on AWS Amplify
+**Live Site**: https://biblical-blog.vercel.app
 **Repository**: https://github.com/kzenow/biblical-blog
 
 ---
@@ -28,8 +28,9 @@ A full-featured WordPress-style blog platform built with Next.js 14 and Supabase
 - **@supabase/ssr** - Server-side rendering support
 
 ### Deployment
-- **AWS Amplify** - Hosting with SSR support
-- **GitHub** - Version control
+- **Vercel** - Hosting with SSR support (production)
+- **GitHub** - Version control and CI/CD
+- **Vercel Cron Jobs** - Automated post status updates
 
 ---
 
@@ -254,67 +255,69 @@ Visit `http://localhost:3000`
 
 ---
 
-## 🌐 Deployment (AWS Amplify)
+## 🌐 Deployment (Vercel)
 
-### Initial Setup
+### Why Vercel?
 
-1. **Connect GitHub Repository**
-   - Go to AWS Amplify Console
-   - Click "New app" → "Host web app"
-   - Connect your GitHub repository
-   - Select the `main` branch
+The project is deployed on **Vercel** (made by the Next.js team) because:
+- ✅ Perfect Next.js 14 App Router support
+- ✅ Environment variables work flawlessly
+- ✅ Built-in cron jobs for scheduled tasks
+- ✅ Automatic deployments from GitHub
+- ✅ Excellent performance and reliability
 
-2. **Configure Build Settings**
-   - Amplify should auto-detect `amplify.yml`
-   - If not, paste the contents of `amplify.yml`
+**Note**: AWS Amplify was initially attempted but had compatibility issues with Next.js 14 App Router - environment variables wouldn't load properly despite being configured correctly in the Amplify console.
 
-3. **Add Environment Variables** (CRITICAL!)
+### Deployment Steps
+
+1. **Sign Up for Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Sign up with your GitHub account (free)
+
+2. **Import Repository**
+   - Click "Add New Project"
+   - Import `kzenow/biblical-blog` repository
+   - Vercel auto-detects Next.js configuration
+
+3. **Add Environment Variables**
+   - In the import screen, add:
    ```
-   NEXT_PUBLIC_SUPABASE_URL=https://cjogibiqelgchjogjchp.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
    ```
+   - **Important**: No quotes, no spaces after `=`
 
-4. **Save and Deploy**
+4. **Deploy**
+   - Click "Deploy"
+   - Wait ~2 minutes for build to complete
+   - Your site will be live at `your-project.vercel.app`
 
-### Important Notes for AWS Amplify
+### Post-Deployment
 
-- **Platform**: Must be "Web Compute" or "Hosting with SSR" (not just "Web")
-- **Framework**: Next.js 14 with App Router
-- **Output mode**: `standalone` (configured in `next.config.js`)
-- **Dynamic routes**: Auth pages use `export const dynamic = 'force-dynamic'`
+**Configure Supabase Callback URL**:
+1. Go to Supabase dashboard → Authentication → URL Configuration
+2. Add redirect URL: `https://your-project.vercel.app/auth/callback`
 
-### Common Deployment Issues
+**Custom Domain (Optional)**:
+1. In Vercel dashboard → Settings → Domains
+2. Add your custom domain
+3. Follow DNS configuration instructions
 
-**Issue**: "Export encountered errors on /auth/login"
-- **Cause**: Environment variables not set or auth pages trying to pre-render
-- **Solution**:
-  1. Verify env vars are set in Amplify console
-  2. Check `app/auth/layout.tsx` has `export const dynamic = 'force-dynamic'`
-  3. Rebuild
+### Automatic Deployments
 
-**Issue**: Supabase client error during build
-- **Cause**: Env vars not available at build time
-- **Solution**:
-  1. Double-check env vars (no spaces after `=`)
-  2. Look for env vars in build log (`env` command in `amplify.yml`)
+- Every push to `main` branch triggers automatic deployment
+- Preview deployments for pull requests
+- Instant rollback capability
 
 ---
 
 ## 🔄 Automatic Post Status Updates
 
-### Cron Job Setup
+### Vercel Cron Jobs (Already Configured)
 
-The blog needs a scheduled task to update post statuses automatically.
+The blog uses **Vercel's built-in cron jobs** to automatically update post statuses.
 
-**Endpoint**: `/api/cron/update-posts`
-
-**What it does**:
-1. Moves scheduled posts to published when `featured_start` time arrives
-2. Moves published posts to archived when `featured_end` time passes
-
-### Option 1: Vercel Cron (if you switch to Vercel)
-
-Create `vercel.json`:
+**Configuration**: `vercel.json`
 ```json
 {
   "crons": [{
@@ -324,13 +327,30 @@ Create `vercel.json`:
 }
 ```
 
-### Option 2: External Cron Service
+**How it works**:
+- Runs every 5 minutes automatically
+- No external services needed
+- Built into Vercel deployment
+- Calls `/api/cron/update-posts` endpoint
 
-Use [cron-job.org](https://cron-job.org) or similar:
+**What the cron job does**:
+1. Moves scheduled posts to published when `featured_start` time arrives
+2. Moves published posts to archived when `featured_end` time passes
+
+**Verify it's working**:
+- Check Vercel dashboard → Your Project → Cron Jobs
+- View execution logs and history
+- Manually trigger for testing
+
+### Alternative Options (If Not Using Vercel)
+
+**Option A: External Cron Service**
+
+Use [cron-job.org](https://cron-job.org):
 - URL: `https://your-site.com/api/cron/update-posts`
 - Schedule: Every 5 minutes (`*/5 * * * *`)
 
-### Option 3: GitHub Actions
+**Option B: GitHub Actions**
 
 Create `.github/workflows/update-posts.yml`:
 ```yaml
@@ -371,12 +391,18 @@ npm run dev
 # Re-run supabase-schema.sql if needed
 ```
 
-### Production (AWS Amplify)
+### Production (Vercel)
 
-**Issue**: Build fails with auth page errors
-- Check env vars in Amplify Console
-- Verify `amplify.yml` is being used
-- Check build logs for actual error
+**Issue**: Environment variables not working
+- Go to Vercel dashboard → Settings → Environment Variables
+- Verify both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set
+- Redeploy after adding/changing env vars
+- Check no quotes or spaces in values
+
+**Issue**: Build fails
+- Check Vercel build logs for specific errors
+- Verify `package.json` dependencies are correct
+- Try `npm run build` locally first
 
 **Issue**: Images not loading
 - Verify Supabase storage bucket is public
@@ -385,8 +411,14 @@ npm run dev
 
 **Issue**: Authentication not working
 - Check Supabase Auth settings
-- Verify callback URL: `https://your-site.com/auth/callback`
+- Verify callback URL in Supabase: `https://your-project.vercel.app/auth/callback`
 - Check browser console for errors
+- Verify environment variables are set in Vercel
+
+**Issue**: Cron job not running
+- Check Vercel dashboard → Cron Jobs section
+- Verify `vercel.json` is in repository root
+- Check execution logs for errors
 
 ### General Issues
 
@@ -399,6 +431,27 @@ npm run dev
 - Build shows warnings about using `<img>` instead of `<Image>`
 - These are non-blocking and don't affect functionality
 - Can be fixed later by migrating to Next.js Image component
+
+### AWS Amplify Compatibility Issues (Archive)
+
+**Why we don't recommend AWS Amplify for this project:**
+
+The project was initially attempted on AWS Amplify but encountered persistent issues:
+
+1. **Environment Variables Not Loading**: Despite being correctly configured in the Amplify console, `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` were not available at build time or runtime
+2. **Next.js 14 App Router Incompatibility**: Amplify's SSR support doesn't fully work with Next.js 14's App Router architecture
+3. **Auth Page Pre-rendering**: Pages with `'use client'` and dynamic exports still tried to pre-render, causing build failures
+
+**Attempts made to resolve:**
+- Added `export const dynamic = 'force-dynamic'` to auth pages
+- Created auth layout with dynamic export
+- Modified `next.config.js` with `output: 'standalone'` and explicit env config
+- Updated `amplify.yml` with framework configuration
+- Verified environment variables multiple times in console
+
+**Conclusion**: These are known compatibility issues with AWS Amplify and Next.js 14 App Router. Vercel (made by the Next.js team) works perfectly without any configuration workarounds.
+
+**Note**: The `amplify.yml` file remains in the repository for reference but is not actively used.
 
 ---
 
@@ -558,7 +611,8 @@ colors: {
 ### Support
 - GitHub Issues: https://github.com/kzenow/biblical-blog/issues
 - Supabase Support: https://supabase.com/support
-- AWS Amplify Docs: https://docs.aws.amazon.com/amplify/
+- Vercel Support: https://vercel.com/support
+- Next.js Discussions: https://github.com/vercel/next.js/discussions
 
 ---
 
@@ -582,6 +636,7 @@ This project is open source and available for personal and commercial use.
 
 ---
 
-**Last Updated**: November 8, 2024
+**Last Updated**: November 9, 2024
 **Version**: 1.0.0
 **Status**: Production Ready ✅
+**Deployed**: https://biblical-blog.vercel.app
